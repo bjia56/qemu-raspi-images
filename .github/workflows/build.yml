@@ -18,6 +18,7 @@ jobs:
       - name: Install QEMU
         run: |
           sudo apt install -y qemu-system
+          qemu-system-aarch64 -version
 
       - name: Get raspi image
         run: |
