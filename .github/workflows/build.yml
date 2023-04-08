@@ -89,26 +89,27 @@ jobs:
       - name: Resize root partition
         run: |
           ssh -p 5555 pi@localhost "sudo sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout"
-          ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
 
-      - name: Stop QEMU
+      - name: Hard reboot and resize root filesystem
         run: |
+          # Stop VM
           ssh -p 5555 pi@localhost "sudo halt" || true
           sleep 1m
           killall qemu-system-aarch64
 
-      - name: Ensure image can boot again
-        run: |
+          # Start VM
           ./files/run_vm.sh & 
           sleep 5m
 
           # Test ssh is up
           ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
 
-          # Check filesystem
+          # Resize filesystem
+          ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
           ssh -p 5555 pi@localhost "df -H"
 
-          # Stop VM
+      - name: Stop QEMU
+        run: |
           ssh -p 5555 pi@localhost "sudo halt" || true
           sleep 1m
           killall qemu-system-aarch64
