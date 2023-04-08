@@ -74,10 +74,7 @@ jobs:
       - name: Boot and setup remote files
         run: |
           ./files/run_vm.sh &
-          sleep 5m
-
-          # Test ssh is up
-          ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
+          ./files/wait_for_ssh.sh localhost 5555 pi
 
           # Copy filesystem layout specification
           scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
@@ -101,10 +98,7 @@ jobs:
 
           # Start VM
           ./files/run_vm.sh &
-          sleep 5m
-
-          # Test ssh is up
-          ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
+          ./files/wait_for_ssh.sh localhost 5555 pi
 
           # Resize filesystem
           ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
