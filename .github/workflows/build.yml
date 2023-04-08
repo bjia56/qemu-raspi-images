@@ -28,14 +28,14 @@ jobs:
 
       - name: Extract kernel and dtb
         run: |
-          mkdir -p /mnt/raspi/
-          mount -v -o offset=4194304 -t vfat ./raspi.img /mnt/raspi/
+          sudo mkdir -p /mnt/raspi/
+          sudo mount -v -o offset=4194304 -t vfat ./raspi.img /mnt/raspi/
           ls -la /mnt/raspi/
 
           cp /mnt/raspi/kernel8.img .
           cp /mnt/raspi/bcm2710-rpi-3-b-plus.dtb .
 
-          umount /mnt/raspi/
+          sudo umount /mnt/raspi/
 
       - name: Archive kernel
         uses: actions/upload-artifact@v3
@@ -51,23 +51,22 @@ jobs:
 
       - name: Configure root filesystem
         run: |
-          mkdir -p /mnt/raspi/
-          mount -v -o offset=272629760 -t ext4 ./raspi.img /mnt/raspi/
+          sudo mkdir -p /mnt/raspi/
+          sudo mount -v -o offset=272629760 -t ext4 ./raspi.img /mnt/raspi/
           ls -la /mnt/raspi/
 
           # allow 'pi' to login without a password
-          sed -i '/^pi/d' /mnt/raspi/etc/passwd
-          echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' >> /mnt/raspi/etc/passwd
+          sudo sed -i '/^pi/d' /mnt/raspi/etc/passwd
+          echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd
           cat /mnt/raspi/etc/passwd
-          echo 'PermitEmptyPasswords yes' >> /mnt/raspi/etc/ssh/sshd_config
+          echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config
           cat /mnt/raspi/etc/ssh/sshd_config
 
           # enable ssh
-          ln -s /usr/lib/systemd/system/sshd.service /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
-          chmod 777 /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
-          chown root:root /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
+          sudo ln -s /usr/lib/systemd/system/sshd.service /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
+          sudo chmod 777 /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
 
-          umount /mnt/raspi/
+          sudo umount /mnt/raspi/
 
       - name: Resize disk
         run: |
