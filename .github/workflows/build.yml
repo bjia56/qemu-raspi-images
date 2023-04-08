@@ -84,7 +84,7 @@ jobs:
         run: |
           ssh -p 5555 pi@localhost "sudo systemctl enable ssh"
           ssh -p 5555 pi@localhost "sudo sed -i '/^systemctl/d' /etc/rc.local"
-          ssh -p 5555 pi@localhost "sudo apt-get remove unattended-upgrades"
+          ssh -p 5555 pi@localhost "sudo apt-get remove -y unattended-upgrades"
           ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.timer"
           ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.service" 
 
