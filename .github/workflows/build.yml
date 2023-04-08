@@ -80,10 +80,12 @@ jobs:
           # Copy filesystem layout specification
           scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
 
-      - name: Start sshd with systemctl
+      - name: Modify services with systemctl
         run: |
           ssh -p 5555 pi@localhost "sudo systemctl enable ssh"
           ssh -p 5555 pi@localhost "sudo sed -i '/^systemctl/d' /etc/rc.local"
+          ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.timer"
+          ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.service" 
 
       - name: Resize root partition
         run: |
