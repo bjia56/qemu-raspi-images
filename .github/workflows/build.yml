@@ -1,0 +1,126 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build_raspi_image:
+    name: Build 64 bit raspberry pi image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install QEMU
+        run: |
+          sudo apt install -y qemu-system
+          qemu-system-aarch64 -version
+
+      - name: Get raspberry pi image
+        run: |
+          wget -O raspi.img.xz -q https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-02-22/2023-02-21-raspios-bullseye-arm64-lite.img.xz
+          xz -d -v raspi.img.xz
+          fdisk -l raspi.img
+
+      - name: Extract kernel and dtb
+        run: |
+          sudo mkdir -p /mnt/raspi/
+          sudo mount -v -o offset=4194304 -t vfat ./raspi.img /mnt/raspi/
+          ls -la /mnt/raspi/
+
+          cp /mnt/raspi/kernel8.img .
+          cp /mnt/raspi/bcm2710-rpi-3-b-plus.dtb .
+
+          sudo umount /mnt/raspi/
+
+      - name: Archive kernel
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel8.img
+          path: ./kernel8.img
+
+      - name: Archive dtb
+        uses: actions/upload-artifact@v3
+        with:
+          name: bcm2710-rpi-3-b-plus.dtb
+          path: ./bcm2710-rpi-3-b-plus.dtb
+
+      - name: Configure root filesystem
+        run: |
+          sudo mkdir -p /mnt/raspi/
+          sudo mount -v -o offset=272629760 -t ext4 ./raspi.img /mnt/raspi/
+          ls -la /mnt/raspi/
+
+          # allow 'pi' to login without a password
+          sudo sed -i '/^pi/d' /mnt/raspi/etc/passwd
+          echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd 1> /dev/null
+          echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
+
+          # enable sshd
+          sudo sed -i '/^exit/d' /mnt/raspi/etc/rc.local
+          echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+          sudo rm /mnt/raspi/etc/ssh/sshd_config.d/rename_user.conf
+
+          sudo umount /mnt/raspi/
+
+      - name: Resize disk
+        run: |
+          qemu-img resize raspi.img 16G
+
+      - name: Boot and setup remote files
+        run: |
+          ./files/run_vm.sh &
+          sleep 5m
+
+          # Test ssh is up
+          ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
+
+          # Copy filesystem layout specification
+          scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
+
+      - name: Start sshd with systemctl
+        run: |
+          ssh -p 5555 pi@localhost "sudo systemctl enable ssh"
+          ssh -p 5555 pi@localhost "sudo sed -i '/^systemctl/d' /etc/rc.local"
+
+      - name: Resize root partition
+        run: |
+          ssh -p 5555 pi@localhost "sudo sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout"
+
+      - name: Hard reboot and resize root filesystem
+        run: |
+          # Stop VM
+          ssh -p 5555 pi@localhost "sudo halt" || true
+          sleep 1m
+          killall qemu-system-aarch64
+
+          # Start VM
+          ./files/run_vm.sh &
+          sleep 5m
+
+          # Test ssh is up
+          ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
+
+          # Resize filesystem
+          ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
+          ssh -p 5555 pi@localhost "df -H"
+
+      - name: Stop QEMU
+        run: |
+          ssh -p 5555 pi@localhost "sudo halt" || true
+          sleep 1m
+          killall qemu-system-aarch64
+
+      - name: Compress filesystem
+        run: |
+          xz -v raspi.img
+
+      - name: Archive img
+        uses: actions/upload-artifact@v3
+        with:
+          name: raspi.img.xz
+          path: ./raspi.img.xz
