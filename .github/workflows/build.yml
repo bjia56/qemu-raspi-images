@@ -22,6 +22,69 @@ jobs:
 
       - name: Get raspi image
         run: |
-          wget -O raspi.img.xz https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-02-22/2023-02-21-raspios-bullseye-arm64-lite.img.xz
+          wget -O raspi.img.xz -q https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-02-22/2023-02-21-raspios-bullseye-arm64-lite.img.xz
           xz -d -v raspi.img.xz
           fdisk -l raspi.img
+
+      - name: Extract kernel and dtb
+        run: |
+          mkdir -p /mnt/raspi/
+          mount -v -o offset=4194304 -t vfat ./raspi.img /mnt/raspi/
+          ls -la /mnt/raspi/
+
+          cp /mnt/raspi/kernel8.img .
+          cp /mnt/raspi/bcm2710-rpi-3-b-plus.dtb .
+
+          umount /mnt/raspi/
+
+      - name: Archive kernel
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel8.img
+          path: ./kernel8.img
+
+      - name: Archive dtb
+        uses: actions/upload-artifact@v3
+        with:
+          name: bcm2710-rpi-3-b-plus.dtb
+          path: ./bcm2710-rpi-3-b-plus.dtb
+
+      - name: Configure root filesystem
+        run: |
+          mkdir -p /mnt/raspi/
+          mount -v -o offset=272629760 -t ext4 ./raspi.img /mnt/raspi/
+          ls -la /mnt/raspi/
+
+          # allow 'pi' to login without a password
+          sed -i '/^pi/d' /mnt/raspi/etc/passwd
+          echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' >> /mnt/raspi/etc/passwd
+          cat /mnt/raspi/etc/passwd
+          echo 'PermitEmptyPasswords yes' >> /mnt/raspi/etc/ssh/sshd_config
+          cat /mnt/raspi/etc/ssh/sshd_config
+
+          # enable ssh
+          ln -s /usr/lib/systemd/system/sshd.service /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
+          chmod 777 /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
+          chown root:root /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
+
+          umount /mnt/raspi/
+
+      - name: Resize disk
+        run: |
+          qemu-img resize raspi.img 16G
+
+      - name: Boot
+        run: |
+          qemu-system-aarch64 \
+            -M raspi3b \
+            -cpu cortex-a72 \
+            -append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1" \
+            -dtb bcm2710-rpi-3-b-plus.dtb \
+            -drive if=sd,index=0,file=raspi.img,format=raw \
+            -kernel kernel8.img \
+            -m 1G -smp 4 \
+            -serial stdio \
+            -usb -device usb-mouse -device usb-kbd \
+	          -device usb-net,netdev=net0 \
+	          -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+	          -display none
