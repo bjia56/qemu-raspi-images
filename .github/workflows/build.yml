@@ -61,7 +61,8 @@ jobs:
           echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
 
           # enable ssh
-          sudo cp /mnt/raspi/lib/systemd/system/ssh.service /mnt/raspi/etc/systemd/system/
+          cat /mnt/raspi/etc/rc.local
+          echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
 
           sudo umount /mnt/raspi/
 
