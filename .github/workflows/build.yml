@@ -17,7 +17,8 @@ jobs:
 
       - name: Install QEMU
         run: |
-          sudo apt install -y qemu-system
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq qemu-system >/dev/null
           qemu-system-aarch64 -version
 
       - name: Get raspberry pi image
