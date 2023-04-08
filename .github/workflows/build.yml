@@ -77,5 +77,4 @@ jobs:
 
       - name: Test ssh
         run: |
-          ssh-keyscan -p 5555 localhost
-          ssh -p 5555 pi@localhost date
+          ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
