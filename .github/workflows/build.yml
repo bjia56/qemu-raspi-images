@@ -90,6 +90,7 @@ jobs:
       - name: Resize root partition
         run: |
           ssh -p 5555 pi@localhost "sudo sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout"
+          ssh -p 5555 pi@localhost "rm /tmp/mmcblk0.layout"
 
       - name: Hard reboot and resize root filesystem
         run: |
