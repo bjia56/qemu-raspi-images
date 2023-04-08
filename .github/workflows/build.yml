@@ -70,11 +70,18 @@ jobs:
         run: |
           qemu-img resize raspi.img 16G
 
-      - name: Boot
+      - name: Boot and setup remote files
         run: |
           ./files/run_vm.sh & 
           sleep 5m
 
-      - name: Test ssh
-        run: |
+          # Test ssh is up
           ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
+
+          # Copy files
+          scp -P 5555 ./files/* pi@localhost:/tmp
+
+      - name: Resize root partition
+        run: |
+          ssh -p 5555 pi@localhost "sudo sfdisk /dev/mmcblk0 < mmcblk0.layout"
+          ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
