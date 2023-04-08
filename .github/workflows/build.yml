@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build_raspi_image:
+    name: Build 64 bit raspberry pi image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install QEMU
+        run: |
+          sudo apt install -y qemu-system
+
+      - name: Get raspi image
+        run: |
+          wget -O raspi.img.xz https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-02-22/2023-02-21-raspios-bullseye-arm64-lite.img.xz
+          xz -d -v raspi.img.xz
+          fdisk -l raspi.img
