@@ -90,3 +90,19 @@ jobs:
         run: |
           ssh -p 5555 pi@localhost "sudo sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout"
           ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
+
+      - name: Stop QEMU
+        run: |
+          ssh -p 5555 pi@localhost "sudo halt"
+          sleep 1m
+          killall qemu-system-aarch64
+
+      - name: Compress filesystem
+        run: |
+          xz -v raspi.img
+
+      - name: Archive img
+        uses: actions/upload-artifact@v3
+        with:
+          name: raspi.img.xz
+          path: ./raspi.img.xz
