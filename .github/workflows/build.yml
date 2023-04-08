@@ -90,10 +90,11 @@ jobs:
         run: |
           ssh -p 5555 pi@localhost "sudo sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout"
           ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
+          ssh -p 5555 pi@localhost "df -H"
 
       - name: Stop QEMU
         run: |
-          ssh -p 5555 pi@localhost "sudo halt"
+          ssh -p 5555 pi@localhost "sudo halt" || true
           sleep 1m
           killall qemu-system-aarch64
 
