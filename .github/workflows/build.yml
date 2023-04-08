@@ -109,6 +109,10 @@ jobs:
           ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
           ssh -p 5555 pi@localhost "df -H"
 
+      - name: Prebake tools
+        run: |
+          cat ./files/install_tools.sh | ssh -p 5555 pi@localhost /bin/bash
+
       - name: Stop QEMU
         run: |
           ssh -p 5555 pi@localhost "sudo halt" || true
