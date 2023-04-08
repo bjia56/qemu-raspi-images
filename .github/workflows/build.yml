@@ -83,5 +83,5 @@ jobs:
 
       - name: Resize root partition
         run: |
-          ssh -p 5555 pi@localhost "sudo sfdisk /dev/mmcblk0 < mmcblk0.layout"
+          ssh -p 5555 pi@localhost "sudo sfdisk /dev/mmcblk0 < /tmp/mmcblk0.layout"
           ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
