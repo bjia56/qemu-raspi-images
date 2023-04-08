@@ -87,6 +87,7 @@ jobs:
           ssh -p 5555 pi@localhost "sudo apt-get remove -y unattended-upgrades"
           ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.timer"
           ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.service" 
+          ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily-upgrade.timer"
 
       - name: Resize root partition
         run: |
