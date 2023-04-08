@@ -61,8 +61,7 @@ jobs:
           echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
 
           # enable ssh
-          #sudo ln -s /usr/lib/systemd/system/sshd.service /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
-          #sudo chmod 777 /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
+          sudo ln -s /lib/systemd/system/ssh.service /mnt/raspi/etc/systemd/system/multi-user.target.wants/sshd.service
 
           sudo umount /mnt/raspi/
 
