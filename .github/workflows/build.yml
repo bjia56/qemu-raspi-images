@@ -72,4 +72,9 @@ jobs:
 
       - name: Boot
         run: |
-          ./files/run_vm.sh
+          ./files/run_vm.sh & 
+          sleep 5m
+
+      - name: Test ssh
+        run: |
+          ssh -p 5555 pi@localhost date
