@@ -60,7 +60,7 @@ jobs:
           echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd 1> /dev/null
           echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
 
-          # enable ssh
+          # enable sshd
           sudo sed -i '/^exit/d' /mnt/raspi/etc/rc.local
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
 
@@ -80,6 +80,11 @@ jobs:
 
           # Copy files
           scp -P 5555 ./files/* pi@localhost:/tmp
+
+      - name: Start sshd with systemctl
+        run: |
+          ssh -p 5555 pi@localhost "sudo systemctl enable ssh"
+          ssh -p 5555 pi@localhost "sudo sed -i '/^systemctl/d' /mnt/raspi/etc/rc.local"
 
       - name: Resize root partition
         run: |
