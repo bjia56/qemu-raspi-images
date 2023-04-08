@@ -20,7 +20,7 @@ jobs:
           sudo apt install -y qemu-system
           qemu-system-aarch64 -version
 
-      - name: Get raspi image
+      - name: Get raspberry pi image
         run: |
           wget -O raspi.img.xz -q https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-02-22/2023-02-21-raspios-bullseye-arm64-lite.img.xz
           xz -d -v raspi.img.xz
@@ -63,7 +63,7 @@ jobs:
           # enable sshd
           sudo sed -i '/^exit/d' /mnt/raspi/etc/rc.local
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
-          sudo rm /mnt/raspi/etc/ssh/sshd_config.d/rename_user.conf 
+          sudo rm /mnt/raspi/etc/ssh/sshd_config.d/rename_user.conf
 
           sudo umount /mnt/raspi/
 
@@ -73,14 +73,14 @@ jobs:
 
       - name: Boot and setup remote files
         run: |
-          ./files/run_vm.sh & 
+          ./files/run_vm.sh &
           sleep 5m
 
           # Test ssh is up
           ssh -p 5555 -o StrictHostKeyChecking=no pi@localhost date
 
-          # Copy files
-          scp -P 5555 ./files/* pi@localhost:/tmp
+          # Copy filesystem layout specification
+          scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
 
       - name: Start sshd with systemctl
         run: |
@@ -99,7 +99,7 @@ jobs:
           killall qemu-system-aarch64
 
           # Start VM
-          ./files/run_vm.sh & 
+          ./files/run_vm.sh &
           sleep 5m
 
           # Test ssh is up
