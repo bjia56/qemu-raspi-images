@@ -84,7 +84,7 @@ jobs:
       - name: Start sshd with systemctl
         run: |
           ssh -p 5555 pi@localhost "sudo systemctl enable ssh"
-          ssh -p 5555 pi@localhost "sudo sed -i '/^systemctl/d' /mnt/raspi/etc/rc.local"
+          ssh -p 5555 pi@localhost "sudo sed -i '/^systemctl/d' /etc/rc.local"
 
       - name: Resize root partition
         run: |
