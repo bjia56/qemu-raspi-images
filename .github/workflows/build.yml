@@ -30,13 +30,13 @@ jobs:
           path: raspi.img.xz
           key: raspios_lite_arm64-2023-02-22
 
-      - name: Get raspberry pi image
+      - name: Download raspberry pi image
         if: ${{ steps.image-cache-restore.outputs.cache-hit != 'true' }}
         run: |
           wget -O raspi.img.xz -q https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-02-22/2023-02-21-raspios-bullseye-arm64-lite.img.xz
 
       - name: Cache image
-        id: image-cache-save
+        if: ${{ steps.image-cache-restore.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v3
         with:
           path: raspi.img.xz
