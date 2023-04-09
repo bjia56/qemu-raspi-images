@@ -31,16 +31,15 @@ ip link set up dev $INTERFACE
 ip link set up dev $TAP
 ip link set up dev $BRIDGE
 
+echo "Printing interfaces and routes"
 ip addr
 ip route
 
+echo "Adding iptables rules"
 iptables -t nat -A POSTROUTING -o $INTERFACE -j MASQUERADE
 iptables -P FORWARD ACCEPT
 
-#iptables -A FORWARD -i $BRIDGE -o $INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
-#iptables -A FORWARD -i $BRIDGE -o $INTERFACE -j ACCEPT
-#iptables -t nat -A POSTROUTING -o $INTERFACE -j MASQUERADE
-
+echo "Starting QEMU"
 qemu-system-aarch64 \
     -M raspi3b \
     -cpu cortex-a72 \

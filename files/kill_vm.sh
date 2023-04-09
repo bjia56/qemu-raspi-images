@@ -9,6 +9,7 @@ BRIDGE="br0"
 TAP="tap0"
 INTERFACE="eth0"
 
+echo "Removing iptables rules"
 iptables -t nat -D POSTROUTING -o $INTERFACE -j MASQUERADE
 
 echo "Removing master of $TAP"
@@ -32,4 +33,5 @@ ip link del $BRIDGE
 echo "Setting $INTERFACE up"
 ip link set up dev $INTERFACE
 
+echo "Killing QEMU"
 killall qemu-system-aarch64
