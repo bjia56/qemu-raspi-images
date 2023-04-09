@@ -84,7 +84,7 @@ jobs:
             cat /etc/nsswitch.conf
             cat /etc/resolv.conf
             ping -c 1 172.18.0.1
-            curl google.com > /dev/null
+            curl -s google.com > /dev/null
           EOF
           sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
           echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
@@ -137,7 +137,7 @@ jobs:
 
           # Resize filesystem
           cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
-            resize2fs /dev/mmcblk0p2
+            #resize2fs /dev/mmcblk0p2
             df -H
           EOF
 
