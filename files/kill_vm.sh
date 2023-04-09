@@ -9,8 +9,6 @@ BRIDGE="br0"
 TAP="tap0"
 INTERFACE="eth0"
 
-iptables -D FORWARD -i $BRIDGE -o $INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -D FORWARD -i $BRIDGE -o $INTERFACE -j ACCEPT
 iptables -t nat -D POSTROUTING -o $INTERFACE -j MASQUERADE
 
 echo "Removing master of $TAP"
@@ -22,8 +20,8 @@ ip link set down dev $TAP
 echo "Deleting $TAP"
 ip tuntap del $TAP
 
-#echo "Removing master of $INTERFACE"
-#ip link set $INTERFACE nomaster
+echo "Removing master of $INTERFACE"
+ip link set $INTERFACE nomaster
 
 echo "Setting $BRIDGE down"
 ip link set down dev $BRIDGE
