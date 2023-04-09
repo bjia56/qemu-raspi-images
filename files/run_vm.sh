@@ -9,7 +9,7 @@ fi
 BRIDGE="br0"
 TAP="tap0"
 INTERFACE="eth0"
-BRIDGE_IP="127.0.0.2/24"
+BRIDGE_IP="172.18.0.1/16"
 
 echo "Adding bridge $BRIDGE"
 ip link add name $BRIDGE type bridge
