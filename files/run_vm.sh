@@ -31,6 +31,7 @@ echo "Setting $BRIDGE IP to $BRIDGE_IP"
 ip addr add $BRIDGE_IP dev $BRIDGE
 
 ip addr
+ip link show type bridge
 
 qemu-system-aarch64 \
     -M raspi3b \
