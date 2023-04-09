@@ -81,6 +81,8 @@ jobs:
             route -n
             systemctl start systemd-resolved
             resolvectl status
+            cat /etc/nsswitch.conf
+            cat /etc/resolv.conf
             ping -c 1 172.18.0.1
             curl google.com > /dev/null
           EOF
