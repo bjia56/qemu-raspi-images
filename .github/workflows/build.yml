@@ -88,6 +88,45 @@ jobs:
             cat /etc/resolv.conf
             ping -c 1 172.18.0.1
             curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
+            curl -s google.com > /dev/null
+            sleep 1
           EOF
           sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
           echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
