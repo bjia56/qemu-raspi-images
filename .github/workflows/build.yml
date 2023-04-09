@@ -68,6 +68,7 @@ jobs:
           sudo sed -i '/^root/d' /mnt/raspi/etc/passwd
           echo 'root::0:0:root:/root:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd 1> /dev/null
           echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
+          echo 'PermitRootLogin yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
 
           # allow appending to rc.local which is our way of injecting startup tasks
           sudo sed -i '/^exit/d' /mnt/raspi/etc/rc.local
