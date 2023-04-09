@@ -15,10 +15,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Runner diagnostics
-        run: |
-          ping -c 5 8.8.8.8
-
       - name: Install QEMU and dependencies
         run: |
           sudo apt-get update -qq >/dev/null
