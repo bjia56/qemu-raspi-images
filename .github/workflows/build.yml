@@ -23,9 +23,27 @@ jobs:
           sudo apt-get install -y -qq qemu-system traceroute >/dev/null
           qemu-system-aarch64 -version
 
+      - name: Get raspberry pi image from cache
+        id: image-cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: raspi.img.xz
+          key: raspios_lite_arm64-2023-02-22
+
       - name: Get raspberry pi image
+        if: ${{ steps.image-cache-restore.outputs.cache-hit != 'true' }}
         run: |
           wget -O raspi.img.xz -q https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-02-22/2023-02-21-raspios-bullseye-arm64-lite.img.xz
+
+      - name: Cache image
+        id: image-cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: raspi.img.xz
+          key: ${{ steps.image-cache-restore.outputs.cache-primary-key }}
+
+      - name: Extract image
+        run: |
           xz -d -v raspi.img.xz
           fdisk -l raspi.img
 
