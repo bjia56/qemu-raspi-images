@@ -61,10 +61,11 @@ jobs:
           echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd 1> /dev/null
           echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
 
-          # enable sshd
+          # configure networking, enable sshd
           sudo sed -i '/^exit/d' /mnt/raspi/etc/rc.local
           echo 'ip addr add 172.18.0.2/16 dev usb0 && ip link set up dev usb0' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'ip addr 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+          echo 'route add default gw 172.18.0.1 usb0' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'route -n 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           sudo rm /mnt/raspi/etc/ssh/sshd_config.d/rename_user.conf
