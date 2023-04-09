@@ -14,8 +14,8 @@ BRIDGE_IP="172.18.0.1/16"
 echo "Adding bridge $BRIDGE"
 ip link add name $BRIDGE type bridge
 
-echo "Setting $BRIDGE as master of $INTERFACE"
-ip link set $INTERFACE master $BRIDGE
+#echo "Setting $BRIDGE as master of $INTERFACE"
+#ip link set $INTERFACE master $BRIDGE
 
 echo "Adding tap $TAP"
 ip tuntap add $TAP mode tap
@@ -32,6 +32,7 @@ ip link set up dev $TAP
 ip link set up dev $BRIDGE
 
 ip addr
+ip route
 
 qemu-system-aarch64 \
     -M raspi3b \
