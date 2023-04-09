@@ -15,8 +15,8 @@ ip link set $TAP nomaster
 echo "Deleting $TAP"
 ip tuntap del $TAP
 
-echo "Removing master of $INTERFACE"
-ip link set $INTERFACE nomaster
+#echo "Removing master of $INTERFACE"
+#ip link set $INTERFACE nomaster
 
 echo "Setting $BRIDGE down"
 ip link set down dev $BRIDGE
