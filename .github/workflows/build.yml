@@ -78,6 +78,11 @@ jobs:
           sudo ./files/run_vm.sh &
           ./files/wait_for_ssh.sh 127.0.0.2 22 pi
 
+      - name: Stop VM on failure
+        if: failure()
+        run: |
+          sudo ./files/kill_vm.sh
+
       - name: Modify services with systemctl
         run: |
           cat <<- "EOF" | ssh pi@127.0.0.2 "sudo /bin/bash"
