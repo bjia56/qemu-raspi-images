@@ -88,7 +88,7 @@ jobs:
           echo 'route add default gw 172.18.0.1 eth0 || true' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'route -n 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'ping -c 5 172.18.0.1 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
-          echo 'ping -c 5 8.8.8.8 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+          echo 'curl google.com 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           sudo rm /mnt/raspi/etc/ssh/sshd_config.d/rename_user.conf
 
