@@ -34,6 +34,10 @@ ip link set up dev $BRIDGE
 ip addr
 ip route
 
+iptables -t nat -A POSTROUTING -o $INTERFACE -j MASQUERADE
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i $TAP -o $INTERFACE -j ACCEPT
+
 qemu-system-aarch64 \
     -M raspi3b \
     -cpu cortex-a72 \
