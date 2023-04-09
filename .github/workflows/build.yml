@@ -74,7 +74,7 @@ jobs:
 
       - name: Initial boot
         run: |
-          ./files/run_vm.sh &
+          sudo ./files/run_vm.sh &
           ./files/wait_for_ssh.sh 127.0.0.2 22 pi
 
       - name: Modify services with systemctl
@@ -100,10 +100,10 @@ jobs:
           # Stop VM
           ssh pi@127.0.0.2 "sudo halt" || true
           sleep 1m
-          ./files/kill_vm.sh
+          sudo ./files/kill_vm.sh
 
           # Start VM
-          ./files/run_vm.sh &
+          sudo ./files/run_vm.sh &
           ./files/wait_for_ssh.sh 127.0.0.2 22 pi
 
           # Resize filesystem
@@ -120,7 +120,7 @@ jobs:
         run: |
           ssh pi@127.0.0.2 "sudo halt" || true
           sleep 1m
-          ./files/kill_vm.sh
+          sudo ./files/kill_vm.sh
 
       - name: Compress filesystem
         run: |
