@@ -34,10 +34,10 @@ ip link set up dev $BRIDGE
 ip addr
 ip route
 
-iptables -t mangle -A PREROUTING -j MARK --set-mark 3 -p tcp -s $BRIDGE
-iptables -t mangle -A PREROUTING -j MARK --set-mark 3 -p tcp -s $TAP
+iptables -t mangle -A PREROUTING -j MARK --set-mark 3 -p tcp -s dev $BRIDGE
+iptables -t mangle -A PREROUTING -j MARK --set-mark 3 -p tcp -s dev $TAP
 # Set default gateway as the proxy server in table 2
-ip route add default via $INTERFACE table 2
+ip route add default via dev $INTERFACE table 2
 # Forward traffic with mark 3 to table 2
 ip rule add fwmark 3 table 2
 
