@@ -56,18 +56,6 @@ jobs:
 
           sudo umount /mnt/raspi/
 
-      - name: Archive kernel
-        uses: actions/upload-artifact@v3
-        with:
-          name: kernel8.img
-          path: ./kernel8.img
-
-      - name: Archive dtb
-        uses: actions/upload-artifact@v3
-        with:
-          name: bcm2710-rpi-3-b-plus.dtb
-          path: ./bcm2710-rpi-3-b-plus.dtb
-
       - name: Configure root filesystem
         run: |
           sudo mkdir -p /mnt/raspi/
@@ -167,6 +155,18 @@ jobs:
         with:
           name: raspi.img.xz
           path: ./raspi.img.xz
+
+      - name: Archive kernel
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel8.img
+          path: ./kernel8.img
+
+      - name: Archive dtb
+        uses: actions/upload-artifact@v3
+        with:
+          name: bcm2710-rpi-3-b-plus.dtb
+          path: ./bcm2710-rpi-3-b-plus.dtb
 
       - name: Stop VM on failure or cancellation
         if: ${{ failure() || cancelled() }}
