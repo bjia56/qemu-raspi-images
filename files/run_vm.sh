@@ -30,6 +30,8 @@ ip link set up dev $BRIDGE
 echo "Setting $BRIDGE IP to $BRIDGE_IP"
 ip addr add $BRIDGE_IP dev $BRIDGE
 
+ip addr
+
 qemu-system-aarch64 \
     -M raspi3b \
     -cpu cortex-a72 \
