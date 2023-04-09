@@ -11,32 +11,32 @@ TAP="tap0"
 INTERFACE="eth0"
 BRIDGE_IP="172.18.0.1/16"
 
-#echo "Adding bridge $BRIDGE"
-#ip link add name $BRIDGE type bridge
+echo "Adding bridge $BRIDGE"
+ip link add name $BRIDGE type bridge
 
-#echo "Setting $BRIDGE as master of $INTERFACE"
-#ip link set $INTERFACE master $BRIDGE
+echo "Setting $BRIDGE as master of $INTERFACE"
+ip link set $INTERFACE master $BRIDGE
 
 echo "Adding tap $TAP"
 ip tuntap add $TAP mode tap
 
-#echo "Setting $BRIDGE as master of $TAP"
-#ip link set $TAP master $BRIDGE
+echo "Setting $BRIDGE as master of $TAP"
+ip link set $TAP master $BRIDGE
 
 echo "Setting $BRIDGE IP to $BRIDGE_IP"
-ip addr add $BRIDGE_IP dev $TAP # $BRIDGE
+ip addr add $BRIDGE_IP dev $BRIDGE
 
 echo "Setting $INTERFACE, $BRIDGE and $TAP up"
-#ip link set up dev $INTERFACE
+ip link set up dev $INTERFACE
 ip link set up dev $TAP
-#ip link set up dev $BRIDGE
+ip link set up dev $BRIDGE
 
 ip addr
 ip route
 
 #iptables -A FORWARD -i $BRIDGE -o $INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
 #iptables -A FORWARD -i $BRIDGE -o $INTERFACE -j ACCEPT
-iptables -t nat -A POSTROUTING -o $INTERFACE -j MASQUERADE
+#iptables -t nat -A POSTROUTING -o $INTERFACE -j MASQUERADE
 
 qemu-system-aarch64 \
     -M raspi3b \
