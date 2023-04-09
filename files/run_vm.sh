@@ -34,7 +34,7 @@ ip link set up dev $BRIDGE
 ip addr
 ip route
 
-iptables -t nat -A POSTROUTING -o $BRIDGE -j MASQUERADE
+iptables -t nat -A POSTROUTING -o $INTERFACE -j MASQUERADE
 iptables -P FORWARD ACCEPT
 
 #iptables -A FORWARD -i $BRIDGE -o $INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
