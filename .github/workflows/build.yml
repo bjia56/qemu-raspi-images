@@ -67,22 +67,25 @@ jobs:
           echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd 1> /dev/null
           echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
 
-          # configure networking
+          # allow appending to rc.local which is our way of injecting startup tasks
           sudo sed -i '/^exit/d' /mnt/raspi/etc/rc.local
+
+          # configure networking
           cat <<- "EOF" | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
-          # the network device can show up as either usb0 or eth0
-          ip addr add 172.18.0.2/16 dev usb0 && ip link set up dev usb0 || true
-          ip addr add 172.18.0.2/16 dev eth0 && ip link set up dev eth0 || true
-          ip addr
-          route add default gw 172.18.0.1 usb0 || true
-          route add default gw 172.18.0.1 eth0 || true
-          route -n
-          systemctl start systemd-resolved
-          resolvectl status
-          sleep 5
-          ping -c 1 172.18.0.1
-          curl google.com > /dev/null
+            # the network device can show up as either usb0 or eth0
+            ip addr add 172.18.0.2/16 dev usb0 && ip link set up dev usb0 || true
+            ip addr add 172.18.0.2/16 dev eth0 && ip link set up dev eth0 || true
+            ip addr
+            route add default gw 172.18.0.1 usb0 || true
+            route add default gw 172.18.0.1 eth0 || true
+            route -n
+            systemctl start systemd-resolved
+            resolvectl status
+            ping -c 1 172.18.0.1
+            curl google.com > /dev/null
           EOF
+          sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
+          echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
 
           # enable sshd, this will be replaced by systemctl after first boot
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
@@ -104,10 +107,10 @@ jobs:
       - name: Modify services with systemctl
         run: |
           cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
-          systemctl enable ssh
-          sed -i '/^systemctl/d' /etc/rc.local
-          systemctl disable apt-daily.timer
-          systemctl disable apt-daily-upgrade.timer
+            systemctl enable ssh
+            sed -i '/^systemctl/d' /etc/rc.local
+            systemctl disable apt-daily.timer
+            systemctl disable apt-daily-upgrade.timer
           EOF
 
       - name: Resize root partition
@@ -115,8 +118,8 @@ jobs:
           scp ./files/mmcblk0.layout pi@172.18.0.2:/tmp
 
           cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
-          sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout
-          rm /tmp/mmcblk0.layout
+            sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout
+            rm /tmp/mmcblk0.layout
           EOF
 
       - name: Hard reboot and resize root filesystem
@@ -132,8 +135,8 @@ jobs:
 
           # Resize filesystem
           cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
-          resize2fs /dev/mmcblk0p2
-          df -H
+            resize2fs /dev/mmcblk0p2
+            df -H
           EOF
 
       - name: Prebake tools
