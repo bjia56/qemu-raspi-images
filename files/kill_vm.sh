@@ -9,6 +9,10 @@ BRIDGE="br0"
 TAP="tap0"
 INTERFACE="eth0"
 
+iptables -t nat -D POSTROUTING -o $INTERFACE -j MASQUERADE
+iptables -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -D FORWARD -i $TAP -o $INTERFACE -j ACCEPT
+
 echo "Removing master of $TAP"
 ip link set $TAP nomaster
 
