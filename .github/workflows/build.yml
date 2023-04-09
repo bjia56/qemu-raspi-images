@@ -141,7 +141,7 @@ jobs:
           traceroute 172.18.0.1
           ping 172.18.0.1
 
-      - name: Stop VM on failure
-        if: ${{ failure() }}
+      - name: Stop VM on failure or cancellation
+        if: ${{ failure() || cancelled() }}
         run: |
           sudo ./files/kill_vm.sh
