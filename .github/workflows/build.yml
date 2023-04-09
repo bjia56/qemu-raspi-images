@@ -12,11 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Gather host information
-        run: |
-          ip addr
-          exit 1
-
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -80,11 +75,11 @@ jobs:
       - name: Initial boot
         run: |
           ./files/run_vm.sh &
-          ./files/wait_for_ssh.sh localhost 5555 pi
+          ./files/wait_for_ssh.sh 127.0.0.2 22 pi
 
       - name: Modify services with systemctl
         run: |
-          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
+          cat <<- "EOF" | ssh pi@127.0.0.2 "sudo /bin/bash"
           systemctl enable ssh
           sed -i '/^systemctl/d' /etc/rc.local
           systemctl disable apt-daily.timer
@@ -93,9 +88,9 @@ jobs:
 
       - name: Resize root partition
         run: |
-          scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
+          scp ./files/mmcblk0.layout pi@127.0.0.2:/tmp
 
-          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
+          cat <<- "EOF" | ssh pi@127.0.0.2 "sudo /bin/bash"
           sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout
           rm /tmp/mmcblk0.layout
           EOF
@@ -103,28 +98,29 @@ jobs:
       - name: Hard reboot and resize root filesystem
         run: |
           # Stop VM
-          ssh -p 5555 pi@localhost "sudo halt" || true
+          ssh pi@127.0.0.2 "sudo halt" || true
           sleep 1m
-          killall qemu-system-aarch64
+          ./files/kill_vm.sh
 
           # Start VM
           ./files/run_vm.sh &
-          ./files/wait_for_ssh.sh localhost 5555 pi
+          ./files/wait_for_ssh.sh 127.0.0.2 22 pi
 
           # Resize filesystem
-          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
-          ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
-          ssh -p 5555 pi@localhost "df -H"
+          cat <<- "EOF" | ssh pi@127.0.0.2 "sudo /bin/bash"
+          resize2fs /dev/mmcblk0p2
+          df -H
+          EOF
 
       - name: Prebake tools
         run: |
-          cat ./files/install_tools.sh | ssh -p 5555 pi@localhost /bin/bash
+          cat ./files/install_tools.sh | ssh pi@127.0.0.2 /bin/bash
 
       - name: Stop QEMU
         run: |
-          ssh -p 5555 pi@localhost "sudo halt" || true
+          ssh pi@127.0.0.2 "sudo halt" || true
           sleep 1m
-          killall qemu-system-aarch64
+          ./files/kill_vm.sh
 
       - name: Compress filesystem
         run: |

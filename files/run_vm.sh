@@ -8,7 +8,8 @@ fi
 
 BRIDGE="br0"
 TAP="tap0"
-INTERFACE="enp7s0"
+INTERFACE="eth0"
+BRIDGE_IP="127.0.0.2/24"
 
 echo "Adding bridge $BRIDGE"
 ip link add name $BRIDGE type bridge
@@ -30,21 +31,8 @@ ip link set up dev $INTERFACE
 ip link set up dev $TAP
 ip link set up dev $BRIDGE
 
-echo "Stopping NetworkManager"
-systemctl stop NetworkManager
-
-echo "Requesting ip for $BRIDGE"
-dhclient $BRIDGE
-
-if [ $? -eq 0 ]; then
-    echo "Requesting ip for $INTERFACE"
-    dhclient $INTERFACE
-    echo "Killing dhclient and starting NetworkManager"
-    pkill -9 dhclient
-    systemctl start NetworkManager
-fi
-
-
+echo "Setting $BRIDGE IP to $BRIDGE_IP"
+ip addr add $BRIDGE_IP dev $BRIDGE
 
 qemu-system-aarch64 \
     -M raspi3b \
@@ -57,5 +45,5 @@ qemu-system-aarch64 \
     -serial stdio \
     -usb -device usb-mouse -device usb-kbd \
     -device usb-net,netdev=net0 \
-    -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+    -netdev tap,id=net0,ifname=$TAP,script=no,downscript=no \
     -display none
