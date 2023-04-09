@@ -64,8 +64,8 @@ jobs:
           # enable sshd
           sudo sed -i '/^exit/d' /mnt/raspi/etc/rc.local
           echo 'ip addr 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
-          echo 'ip addr add 172.18.0.1/16 dev usb0 && ip link set up dev usb0' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
-          echo 'ip addr 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+          #echo 'ip addr add 172.18.0.1/16 dev usb0 && ip link set up dev usb0' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+          #echo 'ip addr 1>&2' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           sudo rm /mnt/raspi/etc/ssh/sshd_config.d/rename_user.conf
 
@@ -134,12 +134,6 @@ jobs:
         with:
           name: raspi.img.xz
           path: ./raspi.img.xz
-
-      - name: Networking diagnostics on failure
-        if: ${{ failure() }}
-        run: |
-          traceroute 172.18.0.1
-          ping 172.18.0.1
 
       - name: Stop VM on failure or cancellation
         if: ${{ failure() || cancelled() }}
