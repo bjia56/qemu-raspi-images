@@ -23,6 +23,9 @@ ip tuntap add $TAP mode tap
 echo "Setting $BRIDGE as master of $TAP"
 ip link set $TAP master $BRIDGE
 
+echo "Setting $BRIDGE IP to $BRIDGE_IP"
+ip addr add $BRIDGE_IP dev $BRIDGE
+
 echo "Setting $INTERFACE, $BRIDGE and $TAP up"
 ip link set up dev $INTERFACE
 ip link set up dev $TAP
