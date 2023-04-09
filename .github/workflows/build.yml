@@ -78,11 +78,6 @@ jobs:
           sudo ./files/run_vm.sh &
           ./files/wait_for_ssh.sh 172.18.0.1 22 pi
 
-      - name: Stop VM on failure
-        if: ${{ failure() }}
-        run: |
-          sudo ./files/kill_vm.sh
-
       - name: Modify services with systemctl
         run: |
           cat <<- "EOF" | ssh pi@172.18.0.1 "sudo /bin/bash"
@@ -118,11 +113,6 @@ jobs:
           df -H
           EOF
 
-      - name: Stop VM on failure
-        if: ${{ failure() }}
-        run: |
-          sudo ./files/kill_vm.sh
-
       - name: Prebake tools
         run: |
           cat ./files/install_tools.sh | ssh pi@172.18.0.1 /bin/bash
@@ -142,3 +132,8 @@ jobs:
         with:
           name: raspi.img.xz
           path: ./raspi.img.xz
+
+      - name: Stop VM on failure
+        if: ${{ failure() }}
+        run: |
+          sudo ./files/kill_vm.sh
