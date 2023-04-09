@@ -143,7 +143,7 @@ jobs:
 
       - name: Prebake tools
         run: |
-          cat ./files/install_tools.sh | ssh pi@172.18.0.2 /bin/bash
+          cat ./files/install_tools.sh | ssh pi@172.18.0.2 "sudo /bin/bash"
 
       - name: Stop QEMU
         run: |
