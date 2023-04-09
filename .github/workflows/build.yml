@@ -91,7 +91,8 @@ jobs:
           route -n
           systemctl start systemd-resolved
           resolvectl status
-          ping -c 1 172.18.0.1 > /dev/null
+          sleep 5
+          ping -c 1 172.18.0.1
           curl google.com > /dev/null
           EOF
 
