@@ -12,6 +12,9 @@ INTERFACE="eth0"
 echo "Removing master of $TAP"
 ip link set $TAP nomaster
 
+echo "Setting $TAP down"
+ip link set down dev $TAP
+
 echo "Deleting $TAP"
 ip tuntap del $TAP
 
