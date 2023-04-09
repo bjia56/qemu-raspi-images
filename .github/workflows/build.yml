@@ -62,9 +62,11 @@ jobs:
           sudo mount -v -o offset=272629760 -t ext4 ./raspi.img /mnt/raspi/
           ls -la /mnt/raspi/
 
-          # allow 'pi' to login without a password
+          # allow 'pi' and 'root' to login without a password
           sudo sed -i '/^pi/d' /mnt/raspi/etc/passwd
           echo 'pi::1000:1000:,,,:/home/pi:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd 1> /dev/null
+          sudo sed -i '/^root/d' /mnt/raspi/etc/passwd
+          echo 'root::0:0:root:/root:/bin/bash' | sudo tee -a /mnt/raspi/etc/passwd 1> /dev/null
           echo 'PermitEmptyPasswords yes' | sudo tee -a /mnt/raspi/etc/ssh/sshd_config 1> /dev/null
 
           # allow appending to rc.local which is our way of injecting startup tasks
@@ -105,6 +107,7 @@ jobs:
         run: |
           sudo ./files/run_vm.sh &
           ./files/wait_for_ssh.sh 172.18.0.2 22 pi
+          ./files/wait_for_ssh.sh 172.18.0.2 22 root
 
       - name: Modify services with systemctl
         run: |
@@ -137,12 +140,18 @@ jobs:
 
           # Resize filesystem
           cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
-            #resize2fs /dev/mmcblk0p2
+            resize2fs /dev/mmcblk0p2
             df -H
           EOF
 
       - name: Prebake tools
         run: |
+          cat <<- "EOF" | ssh root@172.18.0.2 /bin/bash
+            curl google.com
+          EOF
+          cat <<- "EOF" | ssh pi@172.18.0.2 /bin/bash
+            curl google.com
+          EOF
           cat ./files/install_tools.sh | ssh pi@172.18.0.2 "sudo /bin/bash"
 
       - name: Stop QEMU

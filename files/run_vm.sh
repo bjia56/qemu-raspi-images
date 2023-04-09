@@ -49,7 +49,6 @@ qemu-system-aarch64 \
     -kernel kernel8.img \
     -m 1G -smp 4 \
     -serial stdio \
-    -usb -device usb-mouse -device usb-kbd \
-    -device usb-net,netdev=net0 \
+    -usb -device usb-net,netdev=net0 \
     -netdev tap,id=net0,ifname=$TAP,script=no,downscript=no \
     -display none
