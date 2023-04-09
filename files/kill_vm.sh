@@ -24,7 +24,4 @@ ip link set down dev $BRIDGE
 echo "Deleting $BRIDGE"
 ip link del $BRIDGE
 
-echo "Setting $INTERFACE up"
-ip link set up dev $INTERFACE
-
 killall qemu-system-aarch64

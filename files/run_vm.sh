@@ -14,9 +14,6 @@ BRIDGE_IP="127.0.0.2/24"
 echo "Adding bridge $BRIDGE"
 ip link add name $BRIDGE type bridge
 
-echo "Flushing interface $INTERFACE"
-ip addr flush dev $INTERFACE
-
 echo "Setting $BRIDGE as master of $INTERFACE"
 ip link set $INTERFACE master $BRIDGE
 
@@ -26,8 +23,7 @@ ip tuntap add $TAP mode tap
 echo "Setting $BRIDGE as master of $TAP"
 ip link set $TAP master $BRIDGE
 
-echo "Setting $INTERFACE, $BRIDGE and $TAP up"
-ip link set up dev $INTERFACE
+echo "Setting $BRIDGE and $TAP up"
 ip link set up dev $TAP
 ip link set up dev $BRIDGE
 
