@@ -87,6 +87,7 @@ jobs:
           echo 'route add default gw 172.18.0.1 usb0 || true' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'route add default gw 172.18.0.1 eth0 || true' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'route -n' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+          echo 'resolvectl status' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'ping -c 1 172.18.0.1 >/dev/null' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'curl google.com >/dev/null' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
