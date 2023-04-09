@@ -86,48 +86,10 @@ jobs:
             #resolvectl status
             cat /etc/nsswitch.conf
             cat /etc/resolv.conf
+            systemctl stop dhcpcd.service
             systemctl disable dhcpcd.service
             ping -c 1 172.18.0.1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
-            curl google.com > /dev/null
-            sleep 1
+            curl google.com
           EOF
           sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
           echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
