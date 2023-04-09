@@ -6,7 +6,7 @@ qemu-system-aarch64 \
     -dtb bcm2710-rpi-3-b-plus.dtb \
     -drive if=sd,index=0,file=raspi.img,format=raw \
     -kernel kernel8.img \
-    -m 1G -smp 1 \
+    -m 1G -smp 4 \
     -serial stdio \
     -usb -device usb-mouse -device usb-kbd \
     -device usb-net,netdev=net0 \
