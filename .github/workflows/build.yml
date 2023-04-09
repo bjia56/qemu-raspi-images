@@ -12,6 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Gather host information
+        run: |
+          ip addr
+          exit 1
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -72,27 +77,28 @@ jobs:
         run: |
           qemu-img resize raspi.img 16G
 
-      - name: Boot and setup remote files
+      - name: Initial boot
         run: |
           ./files/run_vm.sh &
           ./files/wait_for_ssh.sh localhost 5555 pi
 
-          # Copy filesystem layout specification
-          scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
-
       - name: Modify services with systemctl
         run: |
-          ssh -p 5555 pi@localhost "sudo systemctl enable ssh"
-          ssh -p 5555 pi@localhost "sudo sed -i '/^systemctl/d' /etc/rc.local"
-          ssh -p 5555 pi@localhost "sudo apt-get remove -y unattended-upgrades"
-          ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.timer"
-          ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily.service" 
-          ssh -p 5555 pi@localhost "sudo systemctl disable apt-daily-upgrade.timer"
+          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
+          systemctl enable ssh
+          sed -i '/^systemctl/d' /etc/rc.local
+          systemctl disable apt-daily.timer
+          systemctl disable apt-daily-upgrade.timer
+          EOF
 
       - name: Resize root partition
         run: |
-          ssh -p 5555 pi@localhost "sudo sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout"
-          ssh -p 5555 pi@localhost "rm /tmp/mmcblk0.layout"
+          scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
+
+          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
+          sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout
+          rm /tmp/mmcblk0.layout
+          EOF
 
       - name: Hard reboot and resize root filesystem
         run: |
@@ -106,6 +112,7 @@ jobs:
           ./files/wait_for_ssh.sh localhost 5555 pi
 
           # Resize filesystem
+          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
           ssh -p 5555 pi@localhost "sudo resize2fs /dev/mmcblk0p2"
           ssh -p 5555 pi@localhost "df -H"
 
