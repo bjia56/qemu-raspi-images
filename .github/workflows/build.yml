@@ -86,6 +86,7 @@ jobs:
             #resolvectl status
             cat /etc/nsswitch.conf
             cat /etc/resolv.conf
+            systemctl disable dhcpcd.service
             ping -c 1 172.18.0.1
             curl google.com > /dev/null
             sleep 1
@@ -156,6 +157,7 @@ jobs:
             sed -i '/^systemctl/d' /etc/rc.local
             systemctl disable apt-daily.timer
             systemctl disable apt-daily-upgrade.timer
+            systemctl disable dhcpcd.service
           EOF
 
       - name: Resize root partition
