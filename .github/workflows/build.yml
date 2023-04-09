@@ -17,8 +17,6 @@ jobs:
 
       - name: Install QEMU and dependencies
         run: |
-          sudo sysctl net.ipv4.ip_forward
-          sudo sysctl -w net.ipv4.ip_forward=1 
           sudo apt-get update -qq >/dev/null
           sudo apt-get install -y -qq qemu-system traceroute >/dev/null
           qemu-system-aarch64 -version
