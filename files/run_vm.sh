@@ -40,16 +40,32 @@ BRIDGE_IP="172.18.0.1/16"
 #iptables -P FORWARD ACCEPT
 
 echo "Starting QEMU"
-qemu-system-aarch64 \
-    -M raspi3b \
-    -cpu max \
-    -append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1 net.ifnames=0 biosdevname=0" \
-    -dtb bcm2710-rpi-3-b-plus.dtb \
-    -drive if=sd,index=0,file=raspi.img,format=raw \
-    -kernel kernel8.img \
-    -m 1G -smp 4 \
-    -serial stdio \
-    -usb -device usb-net,netdev=net0 \
-    -netdev user,id=net0,hostfwd=tcp::5555-:22 \
-    -enable-kvm \
-    -display none
+#qemu-system-aarch64 \
+#    -M raspi3b \
+#    -cpu max \
+#    -append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1 net.ifnames=0 biosdevname=0" \
+#    -dtb bcm2710-rpi-3-b-plus.dtb \
+#    -drive if=sd,index=0,file=raspi.img,format=raw \
+#    -kernel kernel8.img \
+#    -m 1G -smp 4 \
+#    -serial stdio \
+#    -usb -device usb-net,netdev=net0 \
+#    -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+#    -enable-kvm \
+#    -display none
+truncate -s 64m varstore.img
+truncate -s 64m efi.img
+dd if=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd of=efi.img conv=notrunc
+qemu-system-aarch64 -M virt  \
+      -machine virtualization=true -machine virt,gic-version=3  \
+      -cpu max,pauth-impdef=on -smp 2 -m 1G           \
+      -drive if=pflash,format=raw,file=efi.img,readonly=on      \
+      -drive if=pflash,format=raw,file=varstore.img         \
+      -drive if=virtio,format=qcow2,file=disk.img           \
+      -device virtio-scsi-pci,id=scsi0              \
+      -object rng-random,filename=/dev/urandom,id=rng0      \
+      -device virtio-rng-pci,rng=rng0               \
+      -device virtio-net-pci,netdev=net0                \
+      -netdev user,id=net0,hostfwd=tcp::5555-:22            \
+      -nographic                            \
+      -drive if=sd,index=0,file=raspi.img,format=raw \
