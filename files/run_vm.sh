@@ -61,11 +61,11 @@ qemu-system-aarch64 -M virt  \
       -cpu max,pauth-impdef=on -smp 2 -m 1G           \
       -drive if=pflash,format=raw,file=efi.img,readonly=on      \
       -drive if=pflash,format=raw,file=varstore.img         \
-      -drive if=virtio,format=qcow2,file=disk.img           \
       -device virtio-scsi-pci,id=scsi0              \
       -object rng-random,filename=/dev/urandom,id=rng0      \
       -device virtio-rng-pci,rng=rng0               \
       -device virtio-net-pci,netdev=net0                \
       -netdev user,id=net0,hostfwd=tcp::5555-:22            \
       -nographic                            \
-      -drive if=sd,index=0,file=raspi.img,format=raw \
+      -display none \
+      -drive if=sd,id=sd0,file=raspi.img,format=raw \
