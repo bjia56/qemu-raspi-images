@@ -86,7 +86,7 @@ jobs:
             route add default gw 172.18.0.1 eth0 || true
             route -n
             ping -c 1 172.18.0.1
-            curl -I https://google.com
+            curl -I http://google.com
           EOF
           sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
           echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
