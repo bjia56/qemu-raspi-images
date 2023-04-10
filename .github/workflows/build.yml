@@ -75,24 +75,24 @@ jobs:
 
           # configure networking
           cat <<- "EOF" | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
-            systemctl stop dhcpcd.service
-            systemctl disable dhcpcd.service
+            #systemctl stop dhcpcd.service
+            #systemctl disable dhcpcd.service
             # the network device can show up as either usb0 or eth0
-            ip addr add 172.18.0.2/16 dev usb0 && ip link set up dev usb0 || true
-            ip addr add 172.18.0.2/16 dev eth0 && ip link set up dev eth0 || true
-            ip addr
-            route add default gw 172.18.0.1 usb0 || true
-            route add default gw 172.18.0.1 eth0 || true
-            route -n
+            #ip addr add 172.18.0.2/16 dev usb0 && ip link set up dev usb0 || true
+            #ip addr add 172.18.0.2/16 dev eth0 && ip link set up dev eth0 || true
+            #ip addr
+            #route add default gw 172.18.0.2 usb0 || true
+            #route add default gw 172.18.0.2 eth0 || true
+            #route -n
             #systemctl start systemd-resolved
             #resolvectl status
-            cat /etc/nsswitch.conf
-            cat /etc/resolv.conf
-            ping -c 1 172.18.0.1
+            #cat /etc/nsswitch.conf
+            #cat /etc/resolv.conf
+            #ping -c 1 172.18.0.2
             curl google.com
           EOF
-          sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
-          echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
+          #sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
+          #echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
 
           # enable sshd, this will be replaced by systemctl after first boot
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
@@ -109,24 +109,24 @@ jobs:
       - name: Initial boot
         run: |
           sudo ./files/run_vm.sh &
-          ./files/wait_for_ssh.sh 172.18.0.2 22 pi
-          ./files/wait_for_ssh.sh 172.18.0.2 22 root
+          ./files/wait_for_ssh.sh localhost 5555 pi
+          ./files/wait_for_ssh.sh localhost 5555 root
 
       - name: Modify services with systemctl
         run: |
-          cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
+          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
             systemctl enable ssh
             sed -i '/^systemctl/d' /etc/rc.local
             systemctl disable apt-daily.timer
             systemctl disable apt-daily-upgrade.timer
-            systemctl disable dhcpcd.service
+            #systemctl disable dhcpcd.service
           EOF
 
       - name: Resize root partition
         run: |
-          scp ./files/mmcblk0.layout pi@172.18.0.2:/tmp
+          scp -P 5555 ./files/mmcblk0.layout pi@localhost:/tmp
 
-          cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
+          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
             sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout
             rm /tmp/mmcblk0.layout
           EOF
@@ -134,33 +134,27 @@ jobs:
       - name: Hard reboot and resize root filesystem
         run: |
           # Stop VM
-          ssh pi@172.18.0.2 "sudo halt" || true
+          ssh -p 5555 pi@localhost "sudo halt" || true
           sleep 1m
           sudo ./files/kill_vm.sh
 
           # Start VM
           sudo ./files/run_vm.sh &
-          ./files/wait_for_ssh.sh 172.18.0.2 22 pi
+          ./files/wait_for_ssh.sh localhost 5555 pi
 
           # Resize filesystem
-          cat <<- "EOF" | ssh pi@172.18.0.2 "sudo /bin/bash"
+          cat <<- "EOF" | ssh -p 5555 pi@localhost "sudo /bin/bash"
             resize2fs /dev/mmcblk0p2
             df -H
           EOF
 
       - name: Prebake tools
         run: |
-          cat <<- "EOF" | ssh root@172.18.0.2 /bin/bash
-            curl google.com
-          EOF
-          cat <<- "EOF" | ssh pi@172.18.0.2 /bin/bash
-            curl google.com
-          EOF
-          cat ./files/install_tools.sh | ssh pi@172.18.0.2 "sudo /bin/bash"
+          cat ./files/install_tools.sh | ssh -p 5555 pi@localhost "sudo /bin/bash"
 
       - name: Stop QEMU
         run: |
-          ssh pi@172.18.0.2 "sudo halt" || true
+          ssh -p 5555 pi@localhost "sudo halt" || true
           sleep 1m
           sudo ./files/kill_vm.sh
 
