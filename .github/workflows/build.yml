@@ -9,7 +9,7 @@ on:
 jobs:
   build_raspi_image:
     name: Build 64 bit raspberry pi image
-    runs-on: ubuntu-latest
+    runs-on: raspberry-pi
 
     steps:
       - name: Checkout repository
