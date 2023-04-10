@@ -75,6 +75,7 @@ jobs:
 
           # configure networking
           cat <<- "EOF" | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+            # dhcp conflicts with our static ip
             systemctl stop dhcpcd.service
             systemctl disable dhcpcd.service
             # the network device can show up as either usb0 or eth0
@@ -84,15 +85,19 @@ jobs:
             route add default gw 172.18.0.1 usb0 || true
             route add default gw 172.18.0.1 eth0 || true
             route -n
-            #systemctl start systemd-resolved
-            #resolvectl status
-            cat /etc/nsswitch.conf
-            cat /etc/resolv.conf
             ping -c 1 172.18.0.1
-            curl google.com
+            curl -I https://google.com
           EOF
           sudo sed -i '/^host/d' /mnt/raspi/etc/nsswitch.conf
           echo 'hosts: files dns' | sudo tee -a /mnt/raspi/etc/nsswitch.conf 1> /dev/null
+
+          # configure apt
+          sudo mkdir -p /mnt/raspi/etc/apt/apt.conf.d/
+          cat <<- "EOF" | sudo tee -a /mnt/raspi/etc/apt/apt.conf.d/99emulationhacks 1> /dev/null
+            Acquire::http::Timeout "60";
+            Acquire::ftp::Timeout "60";
+            Acquire::Retries "10";
+          EOF
 
           # enable sshd, this will be replaced by systemctl after first boot
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
