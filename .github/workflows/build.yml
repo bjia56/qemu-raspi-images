@@ -75,6 +75,10 @@ jobs:
 
           # configure networking
           cat <<- "EOF" | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+            systemctl disable apt-daily.timer
+            systemctl disable apt-daily-upgrade.timer
+            systemctl stop apt-daily.timer
+            systemctl stop apt-daily-upgrade.timer
             # dhcp conflicts with our static ip
             systemctl stop dhcpcd.service
             systemctl disable dhcpcd.service
@@ -102,7 +106,8 @@ jobs:
             apt-mark hold raspberrypi-bootloader raspberrypi-kernel 
           EOF
 
-          # enable sshd, this will be replaced by systemctl after first boot
+          # enable sshd
+          echo 'systemctl enable ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
 
           # remove the password change banner
@@ -120,14 +125,10 @@ jobs:
           ./files/wait_for_ssh.sh 172.18.0.2 22 pi
           ./files/wait_for_ssh.sh 172.18.0.2 22 root
 
-      - name: Modify services with systemctl
+      - name: Remove systemctl from rc.local
         run: |
           cat <<- "EOF" | ssh root@172.18.0.2 "/bin/bash -e"
-            systemctl enable ssh
             sed -i '/^systemctl/d' /etc/rc.local
-            systemctl disable apt-daily.timer
-            systemctl disable apt-daily-upgrade.timer
-            systemctl disable dhcpcd.service
           EOF
 
       - name: Resize root partition
