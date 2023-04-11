@@ -157,6 +157,14 @@ jobs:
         run: |
           cat ./files/install_tools.sh | ssh root@172.18.0.2 /bin/bash
 
+      - name: Gather diagnostics
+        if: ${{ always() }}
+        run: |
+          cat <<- "EOF" | ssh -o ConnectTimeout=30 root@172.18.0.2 /bin/bash
+            systemctl status docker.service
+            journalctl --no-pager -xu docker.service
+          EOF 
+
       - name: Stop QEMU
         run: |
           ssh root@172.18.0.2 halt || true
@@ -184,14 +192,6 @@ jobs:
         with:
           name: bcm2710-rpi-3-b-plus.dtb
           path: ./bcm2710-rpi-3-b-plus.dtb
-
-      - name: Gather diagnostics on failure or cancellation
-        if: ${{ failure() || cancelled() }}
-        run: |
-          cat <<- "EOF" | ssh root@172.18.0.2 /bin/bash
-            systemctl status docker.service
-            journalctl --no-pager -xu docker.service
-          EOF
 
       - name: Stop VM on failure or cancellation
         if: ${{ failure() || cancelled() }}
