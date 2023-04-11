@@ -98,6 +98,9 @@ jobs:
             Acquire::ftp::Timeout "60";
             Acquire::Retries "10";
           EOF
+          cat <<- "EOF" | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
+            apt-mark hold $(uname -r)
+          EOF
 
           # enable sshd, this will be replaced by systemctl after first boot
           echo 'systemctl start ssh.service' | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
