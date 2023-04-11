@@ -190,7 +190,7 @@ jobs:
         run: |
           cat <<- "EOF" | ssh root@172.18.0.2 /bin/bash
             systemctl status docker.service
-            journalctl -x --no-pager docker.service
+            journalctl --no-pager -xu docker.service
           EOF
 
       - name: Stop VM on failure or cancellation
