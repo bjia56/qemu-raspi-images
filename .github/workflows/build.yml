@@ -119,7 +119,7 @@ jobs:
 
       - name: Modify services with systemctl
         run: |
-          cat <<- "EOF" | ssh root@172.18.0.2 /bin/bash
+          cat <<- "EOF" | ssh root@172.18.0.2 "/bin/bash -e"
             systemctl enable ssh
             sed -i '/^systemctl/d' /etc/rc.local
             systemctl disable apt-daily.timer
@@ -131,7 +131,7 @@ jobs:
         run: |
           scp ./files/mmcblk0.layout pi@172.18.0.2:/tmp
 
-          cat <<- "EOF" | ssh root@172.18.0.2 /bin/bash
+          cat <<- "EOF" | ssh root@172.18.0.2 "/bin/bash -e"
             sfdisk --force /dev/mmcblk0 < /tmp/mmcblk0.layout
             rm /tmp/mmcblk0.layout
           EOF
@@ -148,7 +148,7 @@ jobs:
           ./files/wait_for_ssh.sh 172.18.0.2 22 pi
 
           # Resize filesystem
-          cat <<- "EOF" | ssh root@172.18.0.2 /bin/bash
+          cat <<- "EOF" | ssh root@172.18.0.2 "/bin/bash -e"
             resize2fs /dev/mmcblk0p2
             df -H
           EOF
