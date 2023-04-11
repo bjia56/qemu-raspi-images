@@ -155,15 +155,7 @@ jobs:
 
       - name: Prebake tools
         run: |
-          cat ./files/install_tools.sh | ssh root@172.18.0.2 /bin/bash
-
-      - name: Gather diagnostics
-        if: ${{ always() }}
-        run: |
-          cat <<- "EOF" | ssh -o ConnectTimeout=30 root@172.18.0.2 /bin/bash
-            systemctl status docker.service
-            journalctl --no-pager -xu docker.service
-          EOF 
+          cat ./files/install_tools.sh | ssh root@172.18.0.2 "/bin/bash -e"
 
       - name: Stop QEMU
         run: |
@@ -193,7 +185,15 @@ jobs:
           name: bcm2710-rpi-3-b-plus.dtb
           path: ./bcm2710-rpi-3-b-plus.dtb
 
-      - name: Stop VM on failure or cancellation
+      - name: Gather diagnostics
+        if: ${{ failure() || cancelled() }}
+        run: |
+          cat <<- "EOF" | ssh -o ConnectTimeout=30 root@172.18.0.2 /bin/bash
+            systemctl status docker.service
+            journalctl --no-pager -xu docker.service
+          EOF
+
+      - name: Force stop VM
         if: ${{ failure() || cancelled() }}
         run: |
           sudo ./files/kill_vm.sh
