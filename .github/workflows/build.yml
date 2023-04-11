@@ -99,7 +99,7 @@ jobs:
             Acquire::Retries "10";
           EOF
           cat <<- "EOF" | sudo tee -a /mnt/raspi/etc/rc.local 1> /dev/null
-            apt-mark hold $(uname -r)
+            apt-mark hold raspberrypi-bootloader raspberrypi-kernel 
           EOF
 
           # enable sshd, this will be replaced by systemctl after first boot
