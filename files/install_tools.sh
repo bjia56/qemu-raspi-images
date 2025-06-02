@@ -1,8 +1,13 @@
 #!/bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+export UCF_FORCE_CONFFOLD=1
+export UCF_FORCE_CONFDEF=1
+
 # system update
 apt update
-apt -y upgrade
+apt -o Dpkg::Options::="--force-confdef" \
+    -o Dpkg::Options::="--force-confold" -y upgrade
 
 # install docker
 apt -y install ca-certificates curl gnupg
