@@ -23,7 +23,7 @@ jobs:
 
       - name: Get raspberry pi image from cache
         id: image-cache-restore
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: raspi.img.xz
           key: raspios_lite_arm64-2023-02-22
@@ -35,7 +35,7 @@ jobs:
 
       - name: Cache image
         if: ${{ steps.image-cache-restore.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: raspi.img.xz
           key: ${{ steps.image-cache-restore.outputs.cache-primary-key }}
